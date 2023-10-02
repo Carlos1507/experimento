@@ -53,6 +53,8 @@ public class AppActivity extends AppCompatActivity {
             }
         });
         binding.botonAgregar.setOnClickListener(view -> {
+            binding.botonAgregar.setEnabled(false);
+            binding.butonCambiar.setEnabled(false);
             if (binding.butonCambiar.getText().toString().equals(textoMagnetometro)){
                 // Estoy en el Acelerómetro
                 servicioPersonas.random().enqueue(new Callback<ResultAPI>() {
@@ -63,6 +65,8 @@ public class AppActivity extends AppCompatActivity {
                             Persona persona = response.body().getResults().get(0);
                             listaUsuariosAcelerómetro.add(persona);
                             personasAcelerometroVM.getListaPersonasAcelerometro().postValue(listaUsuariosAcelerómetro);
+                            binding.botonAgregar.setEnabled(true);
+                            binding.butonCambiar.setEnabled(true);
                         }
                     }
                     @Override
@@ -80,6 +84,8 @@ public class AppActivity extends AppCompatActivity {
                             Persona persona = response.body().getResults().get(0);
                             listaUsuariosMagnetómetro.add(persona);
                             personasMagnetometroVM.getListaPersonasMagnetometro().postValue(listaUsuariosMagnetómetro);
+                            binding.botonAgregar.setEnabled(true);
+                            binding.butonCambiar.setEnabled(true);
                         }
                     }
                     @Override

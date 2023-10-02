@@ -58,28 +58,22 @@ public class MagnetometroFragment extends Fragment implements SensorEventListene
                 Log.d("mgs-test", "Sensores no disponibles");
             }
         }
-
-
-
         NavController navController = NavHostFragment.findNavController(MagnetometroFragment.this);
         personasMagnetometroVM.getListaPersonasMagnetometro().observe(this, lista->{
             listaMagnetAdapter = new ListaMagnetAdapter();
             listaMagnetAdapter.setContext(getContext());
             listaMagnetAdapter.setListaMagnet(lista);
+            listaMagnetAdapter.setPersonasMagnetometroVM(personasMagnetometroVM);
             binding.recyclerMagnet.setAdapter(listaMagnetAdapter);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
             binding.recyclerMagnet.setLayoutManager(linearLayoutManager);
         });
-
-
         vistaVM.getVistaActual().observe(this, vistaActual->{
             Log.i("MagnetometroFragment", "Valor observado: " + vistaActual);
             if (vistaActual.equals("Acelerómetro")){
                 navController.navigate(R.id.action_magnetometroFragment_to_acelerometroFragment);
             }
         });
-
-
         return binding.getRoot();
     }
 

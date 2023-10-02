@@ -18,11 +18,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.contactosysensores.R;
 import com.example.contactosysensores.VistaVM;
 import com.example.contactosysensores.databinding.FragmentAcelerometroBinding;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class AcelerometroFragment extends Fragment implements SensorEventListener {
@@ -30,6 +32,7 @@ public class AcelerometroFragment extends Fragment implements SensorEventListene
     private VistaVM vistaVM;
     private ListaAcelerAdapter listaAcelerAdapter;
     private PersonasAcelerometroVM personasAcelerometroVM;
+    DecimalFormat df = new DecimalFormat("#.##");
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -57,6 +60,7 @@ public class AcelerometroFragment extends Fragment implements SensorEventListene
             listaAcelerAdapter = new ListaAcelerAdapter();
             listaAcelerAdapter.setContext(getContext());
             listaAcelerAdapter.setListaAceler(lista);
+            listaAcelerAdapter.setPersonasAcelerometroVM(personasAcelerometroVM);
             binding.recyclerAceler.setAdapter(listaAcelerAdapter);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
             binding.recyclerAceler.setLayoutManager(linearLayoutManager);
@@ -67,7 +71,6 @@ public class AcelerometroFragment extends Fragment implements SensorEventListene
                 navController.navigate(R.id.action_acelerometroFragment_to_magnetometroFragment);
             }
         });
-
         return binding.getRoot();
     }
 
@@ -78,10 +81,11 @@ public class AcelerometroFragment extends Fragment implements SensorEventListene
             double aceleracion_total = Math.sqrt(Math.pow(sensorEvent.values[0],2)+
                                                 Math.pow(sensorEvent.values[1],2)+
                                                 Math.pow(sensorEvent.values[2],2));
-            Log.d("aceleracion-total", String.valueOf(aceleracion_total));
             if (aceleracion_total>15.0){
+                Toast.makeText(requireActivity(), String.valueOf(df.format(aceleracion_total))+" m/s^2", Toast.LENGTH_SHORT).show();
                 int itemCount = binding.recyclerAceler.getAdapter().getItemCount();
-                binding.recyclerAceler.smoothScrollToPosition(itemCount-1);
+                if (itemCount>0)
+                    binding.recyclerAceler.smoothScrollToPosition(itemCount-1);
             }
         }
     }

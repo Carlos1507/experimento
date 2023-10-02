@@ -14,11 +14,13 @@ import com.bumptech.glide.Glide;
 import com.example.contactosysensores.R;
 import com.example.contactosysensores.servicio.Persona;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListaMagnetAdapter extends RecyclerView.Adapter<ListaMagnetAdapter.MagnetometroViewHolder> {
     private List<Persona> listaMagnet;
     private Context context;
+    private PersonasMagnetometroVM personasMagnetometroVM;
     @NonNull
     @Override
     public ListaMagnetAdapter.MagnetometroViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,6 +38,7 @@ public class ListaMagnetAdapter extends RecyclerView.Adapter<ListaMagnetAdapter.
         TextView nombre = holder.itemView.findViewById(R.id.nombrePersona);
         TextView ciudad = holder.itemView.findViewById(R.id.ciudadPersona);
         TextView pais = holder.itemView.findViewById(R.id.paisPersona);
+        ImageView eliminarPersona = holder.itemView.findViewById(R.id.eliminar);
         Glide.with(context).load(persona.getPicture().getLarge()).into(fotoPersona);
         genero.setText("Género: "+persona.getGender());
         phone.setText("Phone: "+ persona.getPhone());
@@ -43,6 +46,12 @@ public class ListaMagnetAdapter extends RecyclerView.Adapter<ListaMagnetAdapter.
         ciudad.setText("Ciudad: "+persona.getLocation().getCity());
         pais.setText("País: "+persona.getLocation().getCountry());
         nombre.setText(persona.getName().getTitle()+" "+persona.getName().getFirst()+" "+persona.getName().getLast());
+        eliminarPersona.setOnClickListener(view -> {
+            ArrayList<Persona> listaActual = personasMagnetometroVM.getListaPersonasMagnetometro().getValue();
+            listaActual.remove(persona);
+            personasMagnetometroVM.getListaPersonasMagnetometro().postValue(listaActual);
+            notifyDataSetChanged();
+        });
     }
     @Override
     public int getItemCount() {
@@ -69,5 +78,13 @@ public class ListaMagnetAdapter extends RecyclerView.Adapter<ListaMagnetAdapter.
 
     public void setContext(Context context) {
         this.context = context;
+    }
+
+    public PersonasMagnetometroVM getPersonasMagnetometroVM() {
+        return personasMagnetometroVM;
+    }
+
+    public void setPersonasMagnetometroVM(PersonasMagnetometroVM personasMagnetometroVM) {
+        this.personasMagnetometroVM = personasMagnetometroVM;
     }
 }
