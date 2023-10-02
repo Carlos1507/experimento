@@ -1,5 +1,11 @@
 package com.example.contactosysensores.acelerometro;
 
+import static android.content.Context.SENSOR_SERVICE;
+
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -17,7 +23,9 @@ import com.example.contactosysensores.R;
 import com.example.contactosysensores.VistaVM;
 import com.example.contactosysensores.databinding.FragmentAcelerometroBinding;
 
-public class AcelerometroFragment extends Fragment {
+import java.util.List;
+
+public class AcelerometroFragment extends Fragment implements SensorEventListener {
     FragmentAcelerometroBinding binding;
     private VistaVM vistaVM;
     private ListaAcelerAdapter listaAcelerAdapter;
@@ -33,8 +41,18 @@ public class AcelerometroFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentAcelerometroBinding.inflate(inflater, container, false);
-        NavController navController = NavHostFragment.findNavController(AcelerometroFragment.this);
+        SensorManager sensorManager = (SensorManager) requireActivity().getSystemService(SENSOR_SERVICE);
+        if (sensorManager != null){
+            Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            if (sensor!=null){
+                Log.d("msg-test", "si tengo acelerometro");
+                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
+            }else{
+                Log.d("msg-test","no tengo acelerometro");
+            }
+        }
 
+        NavController navController = NavHostFragment.findNavController(AcelerometroFragment.this);
         personasAcelerometroVM.getListaPersonasAcelerometro().observe(this, lista->{
             listaAcelerAdapter = new ListaAcelerAdapter();
             listaAcelerAdapter.setContext(getContext());
@@ -51,5 +69,30 @@ public class AcelerometroFragment extends Fragment {
         });
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        int type = sensorEvent.sensor.getType();
+        if (type==Sensor.TYPE_ACCELEROMETER){
+            double aceleracion_total = Math.sqrt(Math.pow(sensorEvent.values[0],2)+
+                                                Math.pow(sensorEvent.values[1],2)+
+                                                Math.pow(sensorEvent.values[2],2));
+            Log.d("aceleracion-total", String.valueOf(aceleracion_total));
+            if (aceleracion_total>15.0){
+                int itemCount = binding.recyclerAceler.getAdapter().getItemCount();
+                binding.recyclerAceler.smoothScrollToPosition(itemCount-1);
+            }
+        }
+    }
+    @Override
+    public void onStop(){
+        super.onStop();
+        SensorManager sensorManager = (SensorManager) requireActivity().getSystemService(SENSOR_SERVICE);
+        sensorManager.unregisterListener(this);
+    }
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
     }
 }
