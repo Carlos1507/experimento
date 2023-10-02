@@ -28,6 +28,12 @@ public class MagnetometroFragment extends Fragment implements SensorEventListene
     private VistaVM vistaVM;
     private ListaMagnetAdapter listaMagnetAdapter;
     private PersonasMagnetometroVM personasMagnetometroVM;
+    private Sensor accelerometer;
+    private Sensor magnetometer;
+    private float[] accelerometerReading = new float[3];
+    private float[] magnetometerReading = new float[3];
+    private float[] rotationMatrix = new float[9];
+    private float[] orientationAngles = new float[3];
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -42,12 +48,14 @@ public class MagnetometroFragment extends Fragment implements SensorEventListene
         binding = FragmentMagnetometroBinding.inflate(inflater, container, false);
         SensorManager sensorManager = (SensorManager) requireActivity().getSystemService(SENSOR_SERVICE);
         if (sensorManager != null){
-            Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-            if (sensor!=null){
-                Log.d("msg-test", "si tengo acelerometro");
-                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
-            }else{
-                Log.d("msg-test","no tengo acelerometro");
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+            if (accelerometer != null && magnetometer != null) {
+                sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+                sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+            } else {
+                Log.d("mgs-test", "Sensores no disponibles");
             }
         }
 
@@ -77,11 +85,26 @@ public class MagnetometroFragment extends Fragment implements SensorEventListene
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            System.arraycopy(sensorEvent.values, 0, accelerometerReading, 0, accelerometerReading.length);
+        } else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            System.arraycopy(sensorEvent.values, 0, magnetometerReading, 0, magnetometerReading.length);
+        }
+        SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerReading, magnetometerReading);
+        SensorManager.getOrientation(rotationMatrix, orientationAngles);
+        float azimuthInDegress = (float) Math.toDegrees(orientationAngles[0]);
+        Log.i("azimuth", String.valueOf(Math.abs(azimuthInDegress)));
 
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
+    }
+    @Override
+    public void onStop(){
+        super.onStop();
+        SensorManager sensorManager = (SensorManager) requireActivity().getSystemService(SENSOR_SERVICE);
+        sensorManager.unregisterListener(this);
     }
 }
