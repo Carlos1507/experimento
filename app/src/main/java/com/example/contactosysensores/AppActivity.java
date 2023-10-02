@@ -1,9 +1,14 @@
 package com.example.contactosysensores;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.PopUpToBuilder;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
 import com.example.contactosysensores.acelerometro.PersonasAcelerometroVM;
 import com.example.contactosysensores.databinding.ActivityAppBinding;
@@ -52,6 +57,18 @@ public class AppActivity extends AppCompatActivity {
                 binding.butonCambiar.setText(textoAcelerometro);
             }
         });
+
+        binding.imagenOjo.setOnClickListener(view -> {
+            Log.d("msg-test-nombre"," "+binding.butonCambiar.getText().toString());
+            if (binding.butonCambiar.getText().toString().equals(""+textoMagnetometro)){
+                // Estoy en el Acelerómetro
+                mostrarAlertaAcelerometro();
+            }else{
+                // Estoy en el Magnetómetro
+                mostrarAlertaMagnetometro();
+            }
+        });
+
         binding.botonAgregar.setOnClickListener(view -> {
             binding.botonAgregar.setEnabled(false);
             binding.butonCambiar.setEnabled(false);
@@ -96,5 +113,37 @@ public class AppActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void mostrarAlertaMagnetometro(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Detalles - Magnetómetro");
+        alertDialog.setMessage("Haga CLICK en 'Añadir' para agregar contactos a su lista."+
+                " Esta aplicación está utilizando el MAGNETÓMETRO de su dispositivo.\n\n"+
+                "De esta forma, la lista se mostrará el 100% cuando se apunte al NORTE. "+
+                "Caso contrario, se desvanecerá...");
+        alertDialog.setPositiveButton("Aceptar",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Log.d("msgAlerta", "Positivo");
+                    }
+                });
+        alertDialog.show();
+    }
+    public void mostrarAlertaAcelerometro(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Detalles - Acelerómetro");
+        alertDialog.setMessage("Haga CLICK en 'Añadir' para agregar contactos a su lista."+
+                " Esta aplicación está utilizando el ACELERÓMETRO de su dispositivo.\n\n"+
+                "De esta forma, la lista hará scroll hacia abajo, cuando agite su dispositivo.");
+        alertDialog.setPositiveButton("Aceptar",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Log.d("msgAlerta", "Positivo");
+                    }
+                });
+        alertDialog.show();
     }
 }
