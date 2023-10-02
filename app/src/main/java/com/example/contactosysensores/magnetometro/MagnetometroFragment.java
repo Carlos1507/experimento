@@ -92,9 +92,16 @@ public class MagnetometroFragment extends Fragment implements SensorEventListene
         }
         SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerReading, magnetometerReading);
         SensorManager.getOrientation(rotationMatrix, orientationAngles);
-        float azimuthInDegress = (float) Math.toDegrees(orientationAngles[0]);
-        Log.i("azimuth", String.valueOf(Math.abs(azimuthInDegress)));
-
+        float azimuthInDegress = Math.abs((float) Math.toDegrees(orientationAngles[0]));
+        float startAngle = 0.0f;
+        float endAngle = 180.0f;
+        float opacity = 1.0f;
+        if (azimuthInDegress >= startAngle && azimuthInDegress <= endAngle) {
+            float range = endAngle - startAngle;
+            float adjustedAngle = azimuthInDegress - startAngle;
+            opacity = 1.0f - (adjustedAngle / range);
+        }
+        binding.recyclerMagnet.setAlpha(opacity);
     }
 
     @Override
